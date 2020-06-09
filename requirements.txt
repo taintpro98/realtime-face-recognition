@@ -1,0 +1,5 @@
+face_recognition
+imutils
+trim
+dlib
+Pillow
