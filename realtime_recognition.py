@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import pickle
 import argparse
-
+from imutils.video import FPS
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
@@ -19,9 +19,12 @@ video_capture = cv2.VideoCapture(0)
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-e", "--encodings", type=str, default='encodings.pickle', help="path to serialized db of facial encodings")
+ap.add_argument("-t", "--threshold", type=float, default=0.45, help="threshold to classify unknown people")
+
 args = vars(ap.parse_args())
 
 infile = open(args["encodings"],'rb')
+threshold = args["threshold"]
 data = pickle.load(infile)
 
 # Create arrays of known face encodings and their names
@@ -34,6 +37,7 @@ face_encodings = []
 face_names = []
 process_this_frame = True
 
+fps = FPS().start()
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
@@ -64,14 +68,14 @@ while True:
             # Or instead, use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
-            if matches[best_match_index]:
+            if matches[best_match_index] and face_distances[best_match_index] < threshold:
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
 
     process_this_frame = not process_this_frame
-
-
+    font = cv2.FONT_HERSHEY_DUPLEX
+    
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
@@ -85,15 +89,21 @@ while True:
 
         # Draw a label with a name below the face
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-        font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
+    fps.stop()
+    
+    fps_number = "[INFO] approx. FPS: {:.2f}".format(fps.fps())
+    cv2.putText(frame, fps_number, (50, 50), font, 1, (0, 255, 255), 2, cv2.LINE_4) 
     cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    fps.update()
+
+fps.stop()
 
 # Release handle to the webcam
 video_capture.release()
