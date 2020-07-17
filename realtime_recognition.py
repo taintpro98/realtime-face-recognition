@@ -18,8 +18,7 @@ import argparse
 video_capture = cv2.VideoCapture(0)
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-e", "--encodings", type=str, default='encodings.pickle',
-                help="path to serialized db of facial encodings")
+ap.add_argument("-e", "--encodings", type=str, default='encodings.pickle', help="path to serialized db of facial encodings")
 args = vars(ap.parse_args())
 
 infile = open(args["encodings"],'rb')
