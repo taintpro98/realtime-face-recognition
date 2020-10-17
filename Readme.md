@@ -20,4 +20,4 @@ python pi_face_recognition.py --cascade haarcascade_frontalface_default.xml \
 	--encodings encodings.pickle
 ```
 ## Encoding Dataset
-[You can click here to download encoding dataset](https://drive.google.com/file/d/1Dd-DvLjrEA7DuqyrPCCPsi9QrIyYTV9N/view?usp=sharing)
+[You can click here to download encoding dataset](https://drive.google.com/file/d/1qPgeY_g33ltMphFZByNxaOIrqAdcROp8/view?usp=sharing)
